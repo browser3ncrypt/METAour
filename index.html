@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://bankcoin.loan/space.gif">
     <title>METAour.com - Explore the Metaverse Cosmos</title>
     <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
@@ -190,33 +189,60 @@
         </p>
 
         <div class="demo-section">
-            <h3 class="demo-title">Preview Our Cosmic Metaverse Hub (Tilt Your Phone to Explore!)</h3>
+            <h3 class="demo-title">Preview Our Cosmic Metaverse Hub (Tilt Your Phone to Explore 360°!)</h3>
             <div class="aframe-container">
                 <a-scene embedded cursor="rayOrigin: mouse" raycaster="objects: .clickable" background="color: #000011" device-orientation-permission-ui="enabled: true">
                     <a-entity light="type: ambient; color: #aaa; intensity: 0.4"></a-entity>
                     <a-entity light="type: directional; color: #fff; intensity: 0.7" position="5 10 10"></a-entity>
                     
-                    <!-- Starry Sky -->
+                    <!-- Starry Sky (already 360°) -->
                     <a-sky src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/starry-sky.jpg"></a-sky>
                     
-                    <!-- Floating METAour Text -->
-                    <a-text value="Welcome to METAour Cosmos🚀" color="#a0c4ff" position="0 4 -8" align="center" width="12"></a-text>
+                    <!-- Floating METAour Text (front) -->
+                    <a-text value="Welcome to METAour Cosmos" color="#a0c4ff" position="0 4 -8" align="center" width="12"></a-text>
                     
-                    <!-- Enhanced Planets & Objects -->
+                    <!-- Enhanced Planets & Objects - Distributed in 360° -->
+                    <!-- Front -->
                     <a-sphere position="-5 2 -10" radius="2" color="#ff6600" class="clickable" animation="property: rotation; to: 0 360 0; loop: true; dur: 20000"></a-sphere>
                     <a-sphere position="5 3 -12" radius="1.5" src="https://cdn.aframe.io/a-painter/images/earth.jpg" class="clickable" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000"></a-sphere>
                     <a-torus position="5 3 -12" radius="2" radius-tubular="0.1" color="#ffd700" rotation="30 0 0" animation="property: rotation; to: 30 360 0; loop: true; dur: 30000"></a-torus> <!-- Ring around planet -->
-                    <a-box position="0 2 -8" depth="2" height="2" width="2" color="#ff99ff" class="clickable" animation="property: rotation; to: 360 360 360; loop: true; dur: 12000"></a-box>
-                    <a-cylinder position="0 1 -6" radius="0.5" height="3" color="#00ffff" class="clickable" animation="property: scale; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 4000"></a-cylinder>
                     
-                    <!-- Asteroids -->
+                    <!-- Left -->
+                    <a-sphere position="-12 4 0" radius="3" color="#00ff99" class="clickable" animation="property: rotation; to: 360 0 0; loop: true; dur: 25000"></a-sphere>
+                    <a-box position="-10 1 -5" depth="2.5" height="2.5" width="2.5" color="#ffff00" class="clickable" animation="property: rotation; to: 0 360 360; loop: true; dur: 18000"></a-box>
+                    
+                    <!-- Right -->
+                    <a-sphere position="12 -2 0" radius="2.5" color="#ff00ff" class="clickable" animation="property: rotation; to: 0 -360 0; loop: true; dur: 22000"></a-sphere>
+                    <a-cylinder position="10 3 5" radius="1" height="4" color="#00ffff" class="clickable" animation="property: scale; to: 1.1 1.1 1.1; dir: alternate; loop: true; dur: 3000"></a-cylinder>
+                    
+                    <!-- Behind -->
+                    <a-sphere position="0 5 12" radius="4" color="#6600ff" class="clickable" animation="property: rotation; to: 360 360 0; loop: true; dur: 28000"></a-sphere>
+                    <a-sphere position="-4 -3 10" radius="1.8" color="#ff9900" class="clickable" animation="property: rotation; to: 0 360 360; loop: true; dur: 16000"></a-sphere>
+                    <a-torus position="0 5 12" radius="3" radius-tubular="0.15" color="#ffffff" rotation="0 30 0" animation="property: rotation; to: 0 390 0; loop: true; dur: 35000"></a-torus>
+                    
+                    <!-- Above -->
+                    <a-box position="0 12 -5" depth="3" height="3" width="3" color="#99ff99" class="clickable" animation="property: rotation; to: 360 0 360; loop: true; dur: 20000"></a-box>
+                    
+                    <!-- Below -->
+                    <a-cylinder position="0 -8 0" radius="1.5" height="5" color="#ff00ff" class="clickable" animation="property: scale; to: 1.3 1.3 1.3; dir: alternate; loop: true; dur: 5000"></a-cylinder>
+                    
+                    <!-- Asteroids - Scattered in 360° -->
                     <a-sphere position="-3 1 -5" radius="0.8" color="#808080" animation="property: position; to: -4 2 -6; dir: alternate; loop: true; dur: 5000"></a-sphere>
                     <a-sphere position="3 -1 -7" radius="1" color="#a9a9a9" animation="property: rotation; to: 0 360 360; loop: true; dur: 10000"></a-sphere>
+                    <a-sphere position="-8 3 5" radius="1.2" color="#696969" animation="property: position; to: -9 4 6; dir: alternate; loop: true; dur: 6000"></a-sphere>
+                    <a-sphere position="7 -2 4" radius="0.9" color="#808080" animation="property: rotation; to: 360 0 360; loop: true; dur: 12000"></a-sphere>
+                    <a-sphere position="2 4 10" radius="1.1" color="#a9a9a9" animation="property: position; to: 3 5 11; dir: alternate; loop: true; dur: 7000"></a-sphere>
+                    <a-sphere position="-5 -4 8" radius="0.7" color="#696969" animation="property: rotation; to: 0 -360 0; loop: true; dur: 9000"></a-sphere>
+                    <a-sphere position="0 6 -10" radius="1.3" color="#808080" animation="property: position; to: 0 7 -11; dir: alternate; loop: true; dur: 4000"></a-sphere>
+                    <a-sphere position="4 2 12" radius="0.6" color="#a9a9a9" animation="property: rotation; to: 360 360 0; loop: true; dur: 11000"></a-sphere>
                     
-                    <!-- Simple Spaceship -->
+                    <!-- Spaceships - Multiple, moving in 360° -->
                     <a-cone position="-2 4 -15" radius-bottom="1" radius-top="0" height="3" color="#ff4500" rotation="0 0 90" animation="property: position; to: 2 4 -15; dir: alternate; loop: true; dur: 8000"></a-cone>
+                    <a-cone position="10 5 0" radius-bottom="1.2" radius-top="0" height="4" color="#00ff00" rotation="0 90 0" animation="property: position; to: 10 5 -10; dir: alternate; loop: true; dur: 10000"></a-cone>
+                    <a-cone position="-10 -3 5" radius-bottom="0.8" radius-top="0" height="2.5" color="#0000ff" rotation="0 -90 0" animation="property: position; to: -10 -3 15; dir: alternate; loop: true; dur: 7000"></a-cone>
+                    <a-cone position="0 0 15" radius-bottom="1.5" radius-top="0" height="5" color="#ffff00" rotation="180 0 0" animation="property: position; to: 5 0 15; dir: alternate; loop: true; dur: 12000"></a-cone>
                     
-                    <!-- Star Particles (scattered small spheres) -->
+                    <!-- Star Particles - Dense field scattered in 360° (more added for fullness) -->
                     <a-sphere position="-10 5 -20" radius="0.1" color="#ffffff"></a-sphere>
                     <a-sphere position="10 6 -18" radius="0.1" color="#ffffff"></a-sphere>
                     <a-sphere position="0 10 -25" radius="0.1" color="#ffffff"></a-sphere>
@@ -227,12 +253,33 @@
                     <a-sphere position="9 -2 -23" radius="0.1" color="#ffffff"></a-sphere>
                     <a-sphere position="-4 7 -26" radius="0.1" color="#ffffff"></a-sphere>
                     <a-sphere position="5 1 -17" radius="0.1" color="#ffffff"></a-sphere>
+                    <!-- Additional stars behind and sides -->
+                    <a-sphere position="-15 10 10" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="15 -5 8" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="0 -10 20" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="-12 3 15" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="12 7 -10" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="8 -8 12" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="-7 4 18" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="6 9 -15" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="-9 -2 22" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="10 6 25" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="0 12 0" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="0 -12 0" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="-20 0 0" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="20 0 0" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="0 0 -30" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="0 0 30" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="-15 -10 -15" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="15 10 15" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="-5 15 -10" radius="0.1" color="#ffffff"></a-sphere>
+                    <a-sphere position="5 -15 10" radius="0.1" color="#ffffff"></a-sphere>
                     
                     <!-- Camera with explicit look-controls for tilt -->
-                    <a-camera position="0 1.6 3" look-controls="enabled: true"></a-camera>
+                    <a-camera position="0 1.6 0" look-controls="enabled: true"></a-camera>
                 </a-scene>
             </div>
-            <p>Navigate the cosmos above — tilt your phone to look around in 3D! (Grant permission on mobile for full effect)</p>
+            <p>Navigate the cosmos above — tilt your phone to look around in full 360°! (Grant permission on mobile for full effect)</p>
         </div>
 
         <div class="features">
