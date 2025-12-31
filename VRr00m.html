@@ -77,38 +77,64 @@
             opacity: 0.8;
         }
         
-        /* Info Panel (hidden by default) */
         .info-panel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 600px;
-            background: rgba(0, 10, 40, 0.9);
-            border: 2px solid #a0c4ff;
-            border-radius: 20px;
-            padding: 30px;
-            color: #ffffff;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(160, 196, 255, 0.6);
-            z-index: 20;
-            display: none;
-        }
-        
-        .info-panel h2 {
-            color: #a0c4ff;
-            margin-top: 0;
-        }
-        
-        .info-panel .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 2rem;
-            color: #ff6666;
-            cursor: pointer;
-        }
+    position: fixed;            /* Better than absolute for VR/fullscreen */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 700px;
+    background: rgba(0, 10, 40, 0.95);
+    border: 3px solid #a0c4ff;
+    border-radius: 24px;
+    padding: 40px;
+    color: #ffffff;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(160, 196, 255, 0.8);
+    z-index: 20;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: auto;
+}
+
+.info-panel.visible {
+    display: block;
+    opacity: 1;
+}
+
+.info-panel h2 {
+    color: #a0c4ff;
+    font-size: 2.2rem;
+    margin: 0 0 20px;
+}
+
+.info-panel p {
+    font-size: 1.3rem;
+    line-height: 1.7;
+}
+
+.info-panel a {
+    color: #0d6efd;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.info-panel a:hover {
+    color: #ffffff;
+}
+
+.info-panel .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 3rem;
+    color: #ff6666;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+}
         
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap');
     </style>
@@ -262,27 +288,38 @@
     </div>
     
     <script>
-        // Click handler for all clickable objects
-        document.querySelectorAll('.clickable').forEach(obj => {
-            obj.addEventListener('click', function(evt) {
-                const title = this.getAttribute('data-info-title');
-                const text = this.getAttribute('data-info-text');
-                
-                document.getElementById('panelTitle').textContent = title;
-                document.getElementById('panelText').textContent = text;
-                document.getElementById('infoPanel').style.display = 'block';
-            });
-            
-            // Glow on hover (extra feedback)
-            obj.addEventListener('mouseenter', function() {
-                this.setAttribute('material', 'emissive', '#4488ff');
-                this.setAttribute('material', 'emissiveIntensity', 0.6);
-            });
-            obj.addEventListener('mouseleave', function() {
-                this.setAttribute('material', 'emissive', '#000000');
-                this.setAttribute('material', 'emissiveIntensity', 0);
-            });
+    // Click handler for clickable objects
+    document.querySelectorAll('.clickable').forEach(obj => {
+        obj.addEventListener('click', function() {
+            const title = this.getAttribute('data-info-title');
+            const rawText = this.getAttribute('data-info-text') || '';
+
+            document.getElementById('panelTitle').textContent = title;
+
+            // Auto-make URLs clickable
+            const linkedText = rawText.replace(
+                /(meta\.metaour\.com\/faq)/g,
+                '<a href="https://meta.metaour.com/faq" target="_blank">$1</a>'
+            );
+            document.getElementById('panelText').innerHTML = linkedText;
+
+            // Show panel with animation
+            const panel = document.getElementById('infoPanel');
+            panel.classList.add('visible');
         });
-    </script>
+    });
+
+    // Close panel
+    document.querySelector('.close-btn').addEventListener('click', () => {
+        document.getElementById('infoPanel').classList.remove('visible');
+    });
+
+    // Optional: Close when clicking outside content
+    document.getElementById('infoPanel').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('infoPanel')) {
+            document.getElementById('infoPanel').classList.remove('visible');
+        }
+    });
+</script>
 </body>
 </html>
