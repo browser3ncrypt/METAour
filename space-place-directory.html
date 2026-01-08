@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic VR Room with Unique Hotspot Panels</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #panorama {
+            width: 100%;
+            height: 100%;
+        }
+        .glowing-hotspot {
+            background-color: rgba(255, 255, 0, 0.5);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: glow 1.5s infinite alternate;
+            cursor: pointer;
+        }
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px 5px rgba(255, 255, 0, 0.8);
+            }
+            to {
+                box-shadow: 0 0 20px 15px rgba(255, 255, 0, 0.8);
+            }
+        }
+        #info-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #panel-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        #panel-content {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        #panel-links {
+            margin-top: 20px;
+        }
+        #panel-links a {
+            color: #ffff00;
+            text-decoration: underline;
+            margin: 0 10px;
+        }
+        #close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="panorama"></div>
+
+    <div id="info-panel">
+        <span id="close-btn" onclick="closePanel()">×</span>
+        <h2 id="panel-title"></h2>
+        <p id="panel-content"></p>
+        <div id="panel-links"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script>
+        // Define content for each hotspot (easy to edit/add more)
+        const hotspotData = [
+            {
+                id: 0,
+                title: "Nebula Cluster",
+                description: "A beautiful stellar nursery where new stars are born. Explore the wonders of cosmic creation.",
+                links: [
+                    { text: "Learn More on NASA", url: "https://www.nasa.gov" },
+                    { text: "View Images", url: "https://hubblesite.org" }
+                ]
+            },
+            {
+                id: 1,
+                title: "Pulsar Beacon",
+                description: "A rapidly rotating neutron star emitting beams of electromagnetic radiation.",
+                links: [
+                    { text: "Pulsar Info", url: "https://en.wikipedia.org/wiki/Pulsar" },
+                    { text: "Listen to Pulsar Sounds", url: "https://www.jb.man.ac.uk/pulsar/Education/Sounds/" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Black Hole Horizon",
+                description: "The event horizon of a supermassive black hole – beyond this, nothing escapes.",
+                links: [
+                    { text: "Event Horizon Telescope", url: "https://eventhorizontelescope.org" },
+                    { text: "Black Hole Simulation", url: "https://www.nasa.gov" }
+                ]
+            }
+            // Add more objects here for additional hotspots
+        ];
+
+        pannellum.viewer('panorama', {
+            "type": "equirectangular",
+            "panorama": "https://thumbs.dreamstime.com/b/stunning-space-panorama-immersive-equirectangular-projection-design-inspiration-experience-breathtaking-vastness-388882360.jpg",
+            "autoLoad": true,
+            "hotSpots": [
+                {
+                    "pitch": 0,
+                    "yaw": 0,
+                    "cssClass": "glowing-hotspot",
+                    "clickHandlerFunc": (hotSpotDiv, args) => showUniquePanel(args.id)
+                },
+                {
+                    "pitch": -20,
+                    "yaw": 90,
+                    "cssClass": "glowing-hotspot",
+                    "clickHandlerFunc": (hotSpotDiv, args) => showUniquePanel(args.id)
+                },
+                {
+                    "pitch": 15,
+                    "yaw": -120,
+                    "cssClass": "glowing-hotspot",
+                    "clickHandlerFunc": (hotSpotDiv, args) => showUniquePanel(args.id)
+                }
+                // Add more hotspots with matching id in clickHandlerArgs
+            ].map((hs, index) => ({
+                ...hs,
+                "clickHandlerArgs": { id: index }
+            }))
+        });
+
+        function showUniquePanel(id) {
+            const data = hotspotData[id];
+            if (!data) return;
+
+            document.getElementById('panel-title').textContent = data.title;
+            document.getElementById('panel-content').textContent = data.description;
+
+            const linksContainer = document.getElementById('panel-links');
+            linksContainer.innerHTML = '';
+            data.links.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.target = "_blank";
+                a.textContent = link.text;
+                linksContainer.appendChild(a);
+            });
+
+            document.getElementById('info-panel').style.display = 'block';
+        }
+
+        function closePanel() {
+            document.getElementById('info-panel').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
