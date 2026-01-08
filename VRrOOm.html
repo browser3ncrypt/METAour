@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Cosmic VR Room</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #panorama {
+            width: 100%;
+            height: 100%;
+        }
+        .glowing-hotspot {
+            background-color: rgba(255, 255, 0, 0.5);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: glow 1.5s infinite alternate;
+            cursor: pointer;
+        }
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px 5px rgba(255, 255, 0, 0.7);
+            }
+            to {
+                box-shadow: 0 0 15px 15px rgba(255, 255, 0, 0.7);
+            }
+        }
+        #info-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            max-width: 400px;
+            text-align: center;
+        }
+        #close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="panorama"></div>
+    <div id="info-panel">
+        <span id="close-btn" onclick="closePanel()">X</span>
+        <h2>Glowing Object Information</h2>
+        <p>Visit the link below to meet METAour's Cybercat. With using METAour's text-to-image technology, every time you visit the page a new image of cyber cat is generated. You can also use our encrypted chat feature by clicking on the durable chat link</p>
+        <ul>
+            <li><a href="https://cybercat.metaour.com">Visit Cybercat.METAour.com</a></li>
+            <li><a href="https://meta.metaour.com">Chat with other people using METAour's durable chat</a></li>
+            <!-- Add more links or content here as needed -->
+        </ul>
+        <!-- You can add images, videos, or other HTML elements here -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script>
+        pannellum.viewer('panorama', {
+            "type": "equirectangular",
+            "panorama": "https://thumbs.dreamstime.com/b/stunning-space-panorama-immersive-equirectangular-projection-design-inspiration-experience-breathtaking-vastness-388882360.jpg",
+            "autoLoad": true,
+            "hotSpots": [
+                {
+                    "pitch": 0,
+                    "yaw": 0,
+                    "cssClass": "glowing-hotspot",
+                    "createTooltipFunc": hotspot,
+                    "createTooltipArgs": null,
+                    "clickHandlerFunc": showPanel
+                },
+                {
+                    "pitch": -20,
+                    "yaw": 90,
+                    "cssClass": "glowing-hotspot",
+                    "createTooltipFunc": hotspot,
+                    "createTooltipArgs": null,
+                    "clickHandlerFunc": showPanel
+                },
+                {
+                    "pitch": 15,
+                    "yaw": -120,
+                    "cssClass": "glowing-hotspot",
+                    "createTooltipFunc": hotspot,
+                    "createTooltipArgs": null,
+                    "clickHandlerFunc": showPanel
+                }
+                // Add more hotspots by copying the object above and adjusting pitch/yaw values
+            ]
+        });
+
+        function hotspot(hotSpotDiv, args) {
+            // Custom tooltip if needed, but empty for glowing effect only
+        }
+
+        function showPanel() {
+            document.getElementById('info-panel').style.display = 'block';
+        }
+
+        function closePanel() {
+            document.getElementById('info-panel').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
