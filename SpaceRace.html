@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>METAOUR OR DIE - Space Runner</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: #0a0e17;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    color: #00ffea;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    image-rendering: pixelated;
+  }
+  #overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10,14,23,0.85);
+    z-index: 10;
+    pointer-events: none;
+  }
+  #title {
+    font-size: 80px;
+    text-shadow: 0 0 20px #ff2a6d, 0 0 40px #00ffea;
+    margin: 0;
+  }
+  #subtitle {
+    font-size: 32px;
+    margin: 10px 0 30px;
+    text-shadow: 0 0 15px #00ffea;
+  }
+  #countdown {
+    font-size: 120px;
+    font-weight: bold;
+    text-shadow: 0 0 30px #ff2a6d;
+  }
+  #instructions {
+    font-size: 28px;
+    margin-top: 40px;
+  }
+  #ui {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    text-shadow: 0 0 10px #00ffea;
+    pointer-events: none;
+    z-index: 5;
+  }
+  #game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ff2a6d;
+    font-size: 70px;
+    text-align: center;
+    display: none;
+    text-shadow: 0 0 20px #ff2a6d;
+    z-index: 5;
+  }
+  #restart-btn {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 32px;
+    background: transparent;
+    border: 4px solid #00ffea;
+    color: #00ffea;
+    cursor: pointer;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="ui">
+  METAOUR OR DIE • Score: <span id="score">0</span> • High: <span id="high-score">0</span>
+</div>
+
+<div id="overlay">
+  <h1 id="title">METAOUR OR DIE</h1>
+  <div id="subtitle">SPACE RUNNER</div>
+  <div id="countdown">3</div>
+  <div id="instructions">PRESS SPACE / TAP TO LAUNCH</div>
+</div>
+
+<div id="game-over">
+  CRASHED<br/>INTO THE VOID
+  <button id="restart-btn">RESTART</button>
+</div>
+
+<canvas id="game" width="800" height="300"></canvas>
+
+<script>
+// ───────────────────────────────────────────────
+// CONFIG & CONSTANTS
+// ───────────────────────────────────────────────
+const CONFIG = {
+  GRAVITY:         0.8,
+  JUMP_FORCE:     -14,
+  GAME_SPEED:       5.5,
+  SPEED_INCREASE:   0.0045,     // faster ramp-up for "or die" feel
+  OBSTACLE_FREQ:   95,          // more frequent
+  MIN_OBSTACLE_GAP: 130,
+  GROUND_Y:        240,
+  PLAYER_X:         90,
+  PLAYER_SIZE:      44,
+  OBSTACLE_SIZE:    42,
+  STAR_COUNT:      140,
+  COUNTDOWN_TIME:  3000         // ms
+};
+
+const COLORS = {
+  bg:        '#0a0e17',
+  ground:    '#1a2a44',
+  player:    '#00ffea',
+  obstacle:  '#ff2a6d',
+  text:      '#00ffea',
+  stars:     '#ffffff'
+};
+
+// ───────────────────────────────────────────────
+// GAME STATE
+// ───────────────────────────────────────────────
+const state = {
+  score: 0,
+  highScore: localStorage.getItem('metaourHighScore') || 0,
+  gameSpeed: CONFIG.GAME_SPEED,
+  frameCount: 0,
+  gameOver: false,
+  started: false,
+  countdown: null
+};
+
+// ───────────────────────────────────────────────
+// ENTITIES (unchanged from before, minor tweaks)
+// ───────────────────────────────────────────────
+class Player {
+  constructor() {
+    this.x = CONFIG.PLAYER_X;
+    this.y = CONFIG.GROUND_Y - CONFIG.PLAYER_SIZE;
+    this.vy = 0;
+    this.onGround = true;
+    this.width  = CONFIG.PLAYER_SIZE;
+    this.height = CONFIG.PLAYER_SIZE;
+  }
+
+  jump() {
+    if (this.onGround) {
+      this.vy = CONFIG.JUMP_FORCE;
+      this.onGround = false;
+    }
+  }
+
+  update() {
+    this.vy += CONFIG.GRAVITY;
+    this.y += this.vy;
+    if (this.y >= CONFIG.GROUND_Y - this.height) {
+      this.y = CONFIG.GROUND_Y - this.height;
+      this.vy = 0;
+      this.onGround = true;
+    }
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = COLORS.player;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(this.x + 10, this.y + 10, 24, 8);   // cockpit
+    ctx.fillRect(this.x + 18, this.y + 18, 16, 14);  // flame
+  }
+}
+
+// Obstacle, Star classes unchanged (omitted for brevity, copy from previous version)
+
+class Obstacle {
+  constructor(x) {
+    this.x = x;
+    this.y = CONFIG.GROUND_Y - CONFIG.OBSTACLE_SIZE;
+    this.width  = CONFIG.OBSTACLE_SIZE * 0.75;
+    this.height = CONFIG.OBSTACLE_SIZE;
+  }
+  update() { this.x -= state.gameSpeed; }
+  draw(ctx) {
+    ctx.fillStyle = COLORS.obstacle;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.fillStyle = '#ff6b9d';
+    ctx.fillRect(this.x + 10, this.y + 10, 22, 22);
+  }
+  isOffScreen() { return this.x + this.width < 0; }
+}
+
+class Star {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * (canvas.height * 0.7);
+    this.size = Math.random() * 2 + 1;
+    this.alpha = Math.random() * 0.6 + 0.4;
+  }
+  draw(ctx) {
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = COLORS.stars;
+    ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.globalAlpha = 1;
+  }
+}
+
+// ───────────────────────────────────────────────
+// GAME OBJECTS
+// ───────────────────────────────────────────────
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const highScoreEl = document.getElementById('high-score');
+const overlay = document.getElementById('overlay');
+const countdownEl = document.getElementById('countdown');
+const gameOverEl = document.getElementById('game-over');
+const restartBtn = document.getElementById('restart-btn');
+
+let player = new Player();
+let obstacles = [];
+let stars = [];
+let groundX = 0;
+
+// ───────────────────────────────────────────────
+// HELPERS
+// ───────────────────────────────────────────────
+function resetGame() {
+  state.score = 0;
+  state.gameSpeed = CONFIG.GAME_SPEED;
+  state.frameCount = 0;
+  state.gameOver = false;
+  state.started = false;
+  state.countdown = null;
+
+  player = new Player();
+  obstacles = [];
+  groundX = 0;
+
+  overlay.style.display = 'flex';
+  countdownEl.textContent = '3';
+  gameOverEl.style.display = 'none';
+  restartBtn.style.display = 'none';
+
+  updateUI();
+}
+
+function startCountdown() {
+  if (state.countdown) return;
+  state.countdown = Date.now() + CONFIG.COUNTDOWN_TIME;
+  let num = 3;
+  countdownEl.textContent = num;
+  const interval = setInterval(() => {
+    num--;
+    countdownEl.textContent = num > 0 ? num : 'LAUNCH!';
+    if (num <= 0) {
+      clearInterval(interval);
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        state.started = true;
+      }, 800);
+    }
+  }, 1000);
+}
+
+function spawnObstacle() {
+  if (state.frameCount % CONFIG.OBSTACLE_FREQ === 0 && Math.random() > 0.2) {
+    obstacles.push(new Obstacle(canvas.width + 80));
+  }
+}
+
+function updateObstacles() {
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    const obs = obstacles[i];
+    obs.update();
+    if (obs.isOffScreen()) {
+      obstacles.splice(i, 1);
+      continue;
+    }
+    if (checkCollision(player, obs)) {
+      state.gameOver = true;
+      if (state.score > state.highScore) {
+        state.highScore = Math.floor(state.score);
+        localStorage.setItem('metaourHighScore', state.highScore);
+      }
+    }
+  }
+}
+
+function checkCollision(a, b) {
+  return a.x < b.x + b.width &&
+         a.x + a.width > b.x &&
+         a.y < b.y + b.height &&
+         a.y + a.height > b.y;
+}
+
+function drawBackground() {
+  ctx.fillStyle = COLORS.bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  stars.forEach(s => s.draw(ctx));
+
+  ctx.fillStyle = COLORS.ground;
+  ctx.fillRect(0, CONFIG.GROUND_Y, canvas.width, canvas.height - CONFIG.GROUND_Y);
+
+  ctx.strokeStyle = 'rgba(0, 255, 234, 0.12)';
+  ctx.lineWidth = 1;
+  for (let x = (groundX % 100); x < canvas.width; x += 100) {
+    ctx.beginPath();
+    ctx.moveTo(x, CONFIG.GROUND_Y);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+}
+
+function updateUI() {
+  scoreEl.textContent = Math.floor(state.score);
+  highScoreEl.textContent = state.highScore;
+}
+
+// ───────────────────────────────────────────────
+// GAME LOOP
+// ───────────────────────────────────────────────
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (state.gameOver) {
+    drawBackground();
+    player.draw(ctx);
+    obstacles.forEach(o => o.draw(ctx));
+    gameOverEl.style.display = 'block';
+    restartBtn.style.display = 'inline-block';
+  } else {
+    if (state.started) {
+      state.score += 0.25;
+      state.gameSpeed += CONFIG.SPEED_INCREASE;
+      state.frameCount++;
+
+      player.update();
+      spawnObstacle();
+      updateObstacles();
+      groundX -= state.gameSpeed * 0.7;
+    } else if (state.countdown && Date.now() >= state.countdown) {
+      // handled in startCountdown
+    }
+
+    drawBackground();
+    player.draw(ctx);
+    obstacles.forEach(o => o.draw(ctx));
+    updateUI();
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+// ───────────────────────────────────────────────
+// INPUT
+// ───────────────────────────────────────────────
+function handleInput(e) {
+  if (state.gameOver) return;
+
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.type === 'touchstart') {
+    e.preventDefault();
+    if (!state.started && !state.countdown) {
+      startCountdown();
+    }
+    player.jump();
+  }
+}
+
+window.addEventListener('keydown', handleInput);
+canvas.addEventListener('touchstart', handleInput);
+
+restartBtn.addEventListener('click', resetGame);
+
+// ───────────────────────────────────────────────
+// INIT
+// ───────────────────────────────────────────────
+for (let i = 0; i < CONFIG.STAR_COUNT; i++) stars.push(new Star());
+
+resetGame();
+gameLoop();
+
+</script>
+</body>
+</html>
