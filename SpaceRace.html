@@ -28,44 +28,27 @@
     z-index: 10;
     pointer-events: none;
   }
-  #title {
-    font-size: 80px;
-    text-shadow: 0 0 20px #ff2a6d, 0 0 40px #00ffea;
-    margin: 0;
-  }
-  #subtitle {
-    font-size: 32px;
-    margin: 10px 0 30px;
-    text-shadow: 0 0 15px #00ffea;
-  }
-  #countdown {
-    font-size: 120px;
-    font-weight: bold;
-    text-shadow: 0 0 30px #ff2a6d;
-  }
-  #instructions {
-    font-size: 28px;
-    margin-top: 40px;
-  }
-  /* METAVERSE TIE-IN ICON */
+  #title { font-size: 80px; text-shadow: 0 0 20px #ff2a6d, 0 0 40px #00ffea; margin: 0; }
+  #subtitle { font-size: 32px; margin: 10px 0 30px; text-shadow: 0 0 15px #00ffea; }
+  #countdown { font-size: 120px; font-weight: bold; text-shadow: 0 0 30px #ff2a6d; }
+  #instructions { font-size: 28px; margin-top: 40px; }
   .metaverse-icon {
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
     pointer-events: auto;
-    z-index: 11;
+    z-index: 20;
   }
   .orbit-container {
     position: relative;
     width: 70px;
     height: 70px;
+    cursor: pointer;
   }
   .planet {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 22px;
-    height: 22px;
+    top: 50%; left: 50%;
+    width: 22px; height: 22px;
     margin: -11px 0 0 -11px;
     border-radius: 50%;
     background: 
@@ -75,11 +58,13 @@
     box-shadow: 0 0 12px rgba(0,255,234,0.6);
     animation: orbit 6s linear infinite;
     image-rendering: pixelated;
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.2s, transform 0.1s;
   }
-  .orbit-container:hover .planet {
-    box-shadow: 0 0 20px #00ffea;
-    animation-duration: 3s;
+  .orbit-container:hover .planet,
+  .orbit-container:active .planet {
+    box-shadow: 0 0 20px #00ffea, 0 0 30px rgba(255,42,109,0.4);
+    animation-duration: 2s;
+    transform: scale(1.1);
   }
   @keyframes orbit {
     0% { transform: rotate(0deg) translateX(24px) rotate(0deg); }
@@ -105,7 +90,7 @@
     text-align: center;
     display: none;
     text-shadow: 0 0 20px #ff2a6d;
-    z-index: 5;
+    z-index: 15;
   }
   #restart-btn {
     margin-top: 30px;
@@ -117,9 +102,7 @@
     cursor: pointer;
     display: none;
   }
-  #restart-btn:hover {
-    background: rgba(0,255,234,0.1);
-  }
+  #restart-btn:hover { background: rgba(0,255,234,0.1); }
 </style>
 </head>
 <body>
@@ -128,20 +111,19 @@
   METAOUR • Score: <span id="score">0</span> • High: <span id="high-score">0</span>
 </div>
 
+<div class="metaverse-icon">
+  <a href="https://cybercat.metaour.com/" target="_blank" rel="noopener noreferrer" title="Warp to METAour Metaverse Cosmos 🚀">
+    <div class="orbit-container">
+      <div class="planet"></div>
+    </div>
+  </a>
+</div>
+
 <div id="overlay">
   <h1 id="title">METAOUR</h1>
   <div id="subtitle">SPACE RUNNER</div>
   <div id="countdown">3</div>
   <div id="instructions">PRESS SPACE / TAP TO LAUNCH</div>
-  
-  <!-- Metaverse Tie-In: Orbiting Galaxy Icon -->
-  <div class="metaverse-icon">
-    <a href="https://cybercat.metaour.com/" target="_blank" rel="noopener noreferrer" title="Enter METAour Metaverse Cosmos 🚀">
-      <div class="orbit-container">
-        <div class="planet"></div>
-      </div>
-    </a>
-  </div>
 </div>
 
 <div id="game-over">
@@ -165,7 +147,11 @@ const CONFIG = {
   PLAYER_X:         90,
   PLAYER_SIZE:      44,
   OBSTACLE_SIZE:    42,
-  STAR_COUNT:      140,
+  STAR_LAYERS: [
+    { count: 80,  speedMult: 0.2, sizeMin: 0.8, sizeMax: 1.5, alphaMin: 0.3, alphaMax: 0.6 },
+    { count: 50,  speedMult: 0.5, sizeMin: 1.2, sizeMax: 2.5, alphaMin: 0.5, alphaMax: 0.8 },
+    { count: 30,  speedMult: 1.0, sizeMin: 1.8, sizeMax: 3.5, alphaMin: 0.7, alphaMax: 1.0 }
+  ],
   COUNTDOWN_TIME:  3000
 };
 
@@ -174,9 +160,59 @@ const COLORS = {
   ground:    '#1a2a44',
   player:    '#00ffea',
   obstacle:  '#ff2a6d',
-  text:      '#00ffea',
   stars:     '#ffffff'
 };
+
+// ───────────────────────────────────────────────
+// AUDIO (jump & crash sounds added)
+// ───────────────────────────────────────────────
+let audioCtx = null;
+
+function playSound(notes) {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  notes.forEach((note, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.type = note.type || 'square';
+    osc.frequency.setValueAtTime(note.freq, audioCtx.currentTime + i * 0.02);
+
+    gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.02);
+    gain.gain.linearRampToValueAtTime(note.vol || 0.12, audioCtx.currentTime + i * 0.02 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.02 + note.dur);
+
+    osc.start(audioCtx.currentTime + i * 0.02);
+    osc.stop(audioCtx.currentTime + i * 0.02 + note.dur);
+  });
+}
+
+const JUMP_SOUND = [
+  { freq: 880, dur: 0.08, vol: 0.10, type: 'triangle' },
+  { freq: 659, dur: 0.12, vol: 0.08, type: 'triangle' }
+];
+
+const CRASH_SOUND = [
+  { freq: 220, dur: 0.25, vol: 0.20, type: 'sawtooth' },
+  { freq: 110, dur: 0.30, vol: 0.15, type: 'sawtooth' },
+  { freq: 55,  dur: 0.40, vol: 0.12, type: 'sawtooth' }
+];
+
+const HOVER_SOUND = [
+  { freq: 523, dur: 0.08, vol: 0.07 },
+  { freq: 659, dur: 0.08, vol: 0.07 },
+  { freq: 784, dur: 0.12, vol: 0.05 }
+];
+
+const CLICK_SOUND = [
+  { freq: 65,  dur: 0.25, vol: 0.18, type: 'triangle' },
+  { freq: 523, dur: 0.15, vol: 0.12 },
+  { freq: 659, dur: 0.15, vol: 0.12 },
+  { freq: 784, dur: 0.22, vol: 0.10 }
+];
 
 // ───────────────────────────────────────────────
 // GAME STATE
@@ -208,6 +244,7 @@ class Player {
     if (this.onGround) {
       this.vy = CONFIG.JUMP_FORCE;
       this.onGround = false;
+      playSound(JUMP_SOUND);
     }
   }
 
@@ -225,8 +262,8 @@ class Player {
     ctx.fillStyle = COLORS.player;
     ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(this.x + 10, this.y + 10, 24, 8);   // cockpit
-    ctx.fillRect(this.x + 18, this.y + 18, 16, 14);  // flame
+    ctx.fillRect(this.x + 10, this.y + 10, 24, 8);
+    ctx.fillRect(this.x + 18, this.y + 18, 16, 14);
   }
 }
 
@@ -238,9 +275,7 @@ class Obstacle {
     this.height = CONFIG.OBSTACLE_SIZE;
   }
 
-  update() {
-    this.x -= state.gameSpeed;
-  }
+  update() { this.x -= state.gameSpeed; }
 
   draw(ctx) {
     ctx.fillStyle = COLORS.obstacle;
@@ -250,21 +285,30 @@ class Obstacle {
     ctx.fillRect(this.x + 20, this.y + 20, 16, 16);
   }
 
-  isOffScreen() {
-    return this.x + this.width < 0;
-  }
+  isOffScreen() { return this.x + this.width < 0; }
 }
 
-class Star {
-  constructor() {
-    this.x = Math.random() * 900;  // slight offset for scroll
-    this.y = Math.random() * (300 * 0.7);
-    this.size = Math.random() * 2 + 1;
-    this.alpha = Math.random() * 0.6 + 0.4;
+class ParallaxStar {
+  constructor(layer) {
+    this.layer = layer;
+    this.x = Math.random() * (canvas.width + 200) - 100;
+    this.y = Math.random() * canvas.height * 0.9;
+    this.size = Math.random() * (layer.sizeMax - layer.sizeMin) + layer.sizeMin;
+    this.baseAlpha = Math.random() * (layer.alphaMax - layer.alphaMin) + layer.alphaMin;
+    this.twinklePhase = Math.random() * Math.PI * 2;
+  }
+
+  update() {
+    this.x -= state.gameSpeed * this.layer.speedMult;
+    if (this.x < -this.size * 2) {
+      this.x = canvas.width + this.size * 2 + Math.random() * 100;
+      this.y = Math.random() * canvas.height * 0.9;
+    }
   }
 
   draw(ctx) {
-    ctx.globalAlpha = this.alpha;
+    const twinkle = Math.sin(state.frameCount * 0.08 + this.twinklePhase) * 0.3 + 0.7;
+    ctx.globalAlpha = this.baseAlpha * twinkle;
     ctx.fillStyle = COLORS.stars;
     ctx.fillRect(this.x, this.y, this.size, this.size);
     ctx.globalAlpha = 1;
@@ -282,10 +326,11 @@ const overlay = document.getElementById('overlay');
 const countdownEl = document.getElementById('countdown');
 const gameOverEl = document.getElementById('game-over');
 const restartBtn = document.getElementById('restart-btn');
+const metaverseLink = document.querySelector('.metaverse-icon a');
 
 let player = new Player();
 let obstacles = [];
-let stars = [];
+let stars = []; // now array of ParallaxStar
 let groundX = 0;
 
 // ───────────────────────────────────────────────
@@ -302,6 +347,14 @@ function resetGame() {
   player = new Player();
   obstacles = [];
   groundX = 0;
+
+  // Re-init stars on reset
+  stars = [];
+  CONFIG.STAR_LAYERS.forEach(layer => {
+    for (let i = 0; i < layer.count; i++) {
+      stars.push(new ParallaxStar(layer));
+    }
+  });
 
   overlay.style.display = 'flex';
   countdownEl.textContent = '3';
@@ -344,6 +397,7 @@ function updateObstacles() {
     }
     if (checkCollision(player, obs)) {
       state.gameOver = true;
+      playSound(CRASH_SOUND);
       if (Math.floor(state.score) > state.highScore) {
         state.highScore = Math.floor(state.score);
         localStorage.setItem('metaourHighScore', state.highScore);
@@ -364,12 +418,15 @@ function drawBackground() {
   ctx.fillStyle = COLORS.bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  stars.forEach(s => s.draw(ctx));
+  // Parallax stars (drawn in order: far → near)
+  stars.forEach(star => {
+    star.update();
+    star.draw(ctx);
+  });
 
   ctx.fillStyle = COLORS.ground;
   ctx.fillRect(0, CONFIG.GROUND_Y, canvas.width, canvas.height - CONFIG.GROUND_Y);
 
-  // scrolling grid
   ctx.strokeStyle = 'rgba(0, 255, 234, 0.12)';
   ctx.lineWidth = 1;
   for (let x = (groundX % 100); x < canvas.width; x += 100) {
@@ -418,7 +475,7 @@ function gameLoop() {
 }
 
 // ───────────────────────────────────────────────
-// INPUT
+// INPUT & EVENTS
 // ───────────────────────────────────────────────
 function handleInput(e) {
   if (state.gameOver) return;
@@ -426,14 +483,15 @@ function handleInput(e) {
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.type === 'touchstart') {
     e.preventDefault();
     if (!state.started) {
-      if (!state.countdown) {
-        startCountdown();
-      }
-      return;  // FIXED: No jump on launch input - jump only after started
+      if (!state.countdown) startCountdown();
+      return;
     }
     player.jump();
   }
 }
+
+metaverseLink.addEventListener('mouseenter', () => playSound(HOVER_SOUND));
+metaverseLink.addEventListener('click', () => playSound(CLICK_SOUND));
 
 window.addEventListener('keydown', handleInput);
 canvas.addEventListener('touchstart', handleInput);
@@ -442,10 +500,6 @@ restartBtn.addEventListener('click', resetGame);
 // ───────────────────────────────────────────────
 // INIT
 // ───────────────────────────────────────────────
-for (let i = 0; i < CONFIG.STAR_COUNT; i++) {
-  stars.push(new Star());
-}
-
 resetGame();
 gameLoop();
 </script>
