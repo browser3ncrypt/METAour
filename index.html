@@ -3,426 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://bankcoin.loan/space.gif">
     <title>METAour.com - Explore the Metaverse Cosmos</title>
-    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            font-family: 'Orbitron', 'Segoe UI', sans-serif;
-            background: linear-gradient(to bottom, #000033, #0f0020);
-            color: #e0e0ff;
+            padding: 0;
+            font-family: 'Exo 2', sans-serif;
+            background: #000 url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&q=80') no-repeat center center fixe>
+            background-size: cover;
+            color: #e0f7ff;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            perspective: 1000px; /* Enables 3D space for tilt */
         }
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?ixlib=rb-4.0.3&auto=format&fit=crop&q=80') no-repeat center center/cover;
-            opacity: 0.3;
+
+        /* Starfield overlay for cosmic depth */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background: transparent;
             z-index: -1;
         }
+
+        .stars::before,
+        .stars::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            opacity: 0.7;
+        }
+
+        /* Simple twinkling stars effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: transparent;
+            pointer-events: none;
+            z-index: -2;
+            animation: twinkle 60s infinite alternate;
+            opacity: 0.15;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { background: radial-gradient(circle at 10% 20%, white 1px, transparent 1px), radial-gradient(circle at 30% 80%, white 1px, transp>
+            50% { opacity: 0.4; }
+        }
+
         .container {
             max-width: 1000px;
-            width: 90%;
-            margin: 40px auto;
-            background: rgba(10, 0, 40, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(100, 150, 255, 0.3);
-            padding: 60px 40px;
-            text-align: center;
-            border: 1px solid rgba(100, 200, 255, 0.2);
-            transform-style: preserve-3d; /* Preserves 3D for children */
-        }
-        .logo {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #a0c4ff, #bfd8ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(160, 196, 255, 0.5);
-        }
-        .rocket-icon {
-            font-size: 4.5rem;
-            color: #a0c4ff;
-            margin-bottom: 20px;
-            animation: float 4s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        .new-badge {
-            display: inline-block;
-            background-color: #ffcc0020;
-            color: #ffff99;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 1rem;
-            margin-left: 15px;
-            border: 1px solid #ffff66;
-            box-shadow: 0 0 15px rgba(255, 255, 102, 0.4);
-        }
-        .tagline {
-            font-size: 1.6rem;
-            color: #bbd0ff;
-            margin: 30px 0 50px;
-        }
-        .coming-soon {
-            font-size: 2.2rem;
-            margin: 50px 0 20px;
-            color: #a0c4ff;
-            text-shadow: 0 0 20px #6480ff;
-        }
-        .description {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 50px;
-            color: #ccccff;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .demo-section {
-            margin: 80px 0;
-        }
-        .demo-title {
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            color: #a0c4ff;
-        }
-        .aframe-container {
-            height: 600px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(100, 150, 255, 0.6);
-            margin-bottom: 40px;
-        }
-        .features {
-            text-align: left;
-            margin: 60px auto;
-            max-width: 800px;
-        }
-        .features h2 {
-            text-align: center;
-            color: #a0c4ff;
-            font-size: 2rem;
-            margin-bottom: 40px;
-        }
-        .features ul {
-            list-style: none;
-            padding: 0;
-        }
-        .features li {
-            margin: 20px 0;
-            padding-left: 40px;
+            margin: 0 auto;
+            padding: 40px 20px;
             position: relative;
-            font-size: 1.1rem;
+            z-index: 1;
+            background: rgba(0, 0, 20, 0.55);
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 40px rgba(0, 200, 255, 0.3);
+            margin-top: 40px;
+            margin-bottom: 40px;
         }
-        .features li::before {
-            content: '\f135';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00f0ff;
+            text-shadow: 0 0 15px #00f0ff, 0 0 30px #00f0ff;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: all 0.3s;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        a:hover {
+            color: #ff00ff;
+            text-shadow: 0 0 20px #ff00ff;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin: 15px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: "✦";
             position: absolute;
             left: 0;
-            color: #a0c4ff;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00;
         }
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 60px 0;
-        }
-        .gallery img {
-            width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(160, 196, 255, 0.4);
-            transition: transform 0.4s;
-        }
-        .gallery img:hover {
-            transform: scale(1.05);
-        }
-        .cta {
-            background: linear-gradient(to right, #6480ff, #a0c4ff);
-            color: white;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 20px;
-            box-shadow: 0 0 20px rgba(100, 150, 255, 0.5);
-        }
-        .cta:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 40px rgba(100, 150, 255, 0.8);
-        }
-        footer {
-            margin-top: 80px;
+
+        select#language-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0, 20, 60, 0.8);
+            color: #00f0ff;
+            border: 1px solid #00f0ff;
+            border-radius: 8px;
             font-size: 1rem;
-            color: #8888cc;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(5px);
         }
-        .parallax {
-            transition: transform 0.1s ease-out; /* Smooth tilt */
-            transform-style: preserve-3d;
+.english, .spanish {
+            transition: opacity 0.6s ease;
         }
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+        /* Nebula glow effect on headings */
+        h1, h2, h3 {
+            animation: glow 4s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff, 0 0 30px #00f0ff; }
+            to   { text-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff, 0 0 60px #ff00ff; }
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #00f0ff, transparent);
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .container { padding: 30px 15px; margin: 20px; }
+        }
     </style>
 </head>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-CQZVL77DYG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-CQZVL77DYG');
-</script>
-
 <body>
+
+    <div class="stars"></div>
+
+    <select id="language-toggle" onchange="toggleLanguage()">
+        <option value="english">English</option>
+        <option value="spanish">Español</option>
+    </select>
+
     <div class="container">
-        <div class="rocket-icon parallax">
-            <i class="fas fa-rocket"></i>
-        </div>
-        <h1 class="logo parallax">METAour.com <span class="new-badge">LAUNCHING SOON</span></h1>
-        <p class="tagline">Your gateway to shared cosmic experiences in the metaverse.</p>
-        
-        <h2 class="coming-soon">Launching into the Metaverse Soon!</h2>
-        <p class="description">
-            METAour.com is crafting an infinite digital cosmos for explorers like you. Connect through shared stories, stellar events, and immersive worlds where real connections orbit beyond boundaries. 
-            Journey into virtual galaxies, build persistent hubs, and co-create the future of the meta era. On mobile, grant motion permission in the demo to enable tilt controls!
-        </p>
-
-        <div class="demo-section">
-            <h3 class="demo-title">Preview Our Cosmic Metaverse Hub (Tilt Your Phone to Explore 360°!)</h3>
-            <div class="aframe-container">
-                <a-scene embedded cursor="rayOrigin: mouse" raycaster="objects: .clickable" background="color: #000011" device-orientation-permission-ui="enabled: true">
-                    <a-entity light="type: ambient; color: #aaa; intensity: 0.4"></a-entity>
-                    <a-entity light="type: directional; color: #fff; intensity: 0.7" position="5 10 10"></a-entity>
-                    
-                    <!-- Starry Sky (already 360°) -->
-                    <a-sky src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/starry-sky.jpg"></a-sky>
-                    
-                    <!-- Floating METAour Text (front) -->
-                    <a-text value="Welcome to METAour Cosmos" color="#a0c4ff" position="0 4 -8" align="center" width="12"></a-text>
-                    
-                    <!-- Enhanced Planets & Objects - Distributed in 360° -->
-                    <!-- Front -->
-                    <a-sphere position="-5 2 -10" radius="2" color="#ff6600" class="clickable" animation="property: rotation; to: 0 360 0; loop: true; dur: 20000"></a-sphere>
-                    <a-sphere position="5 3 -12" radius="1.5" src="https://cdn.aframe.io/a-painter/images/earth.jpg" class="clickable" animation="property: rotation; to: 0 360 0; loop: true; dur: 15000"></a-sphere>
-                    <a-torus position="5 3 -12" radius="2" radius-tubular="0.1" color="#ffd700" rotation="30 0 0" animation="property: rotation; to: 30 360 0; loop: true; dur: 30000"></a-torus> <!-- Ring around planet -->
-                    
-                    <!-- Left -->
-                    <a-sphere position="-12 4 0" radius="3" color="#00ff99" class="clickable" animation="property: rotation; to: 360 0 0; loop: true; dur: 25000"></a-sphere>
-                    <a-box position="-10 1 -5" depth="2.5" height="2.5" width="2.5" color="#ffff00" class="clickable" animation="property: rotation; to: 0 360 360; loop: true; dur: 18000"></a-box>
-                    
-                    <!-- Right -->
-                    <a-sphere position="12 -2 0" radius="2.5" color="#ff00ff" class="clickable" animation="property: rotation; to: 0 -360 0; loop: true; dur: 22000"></a-sphere>
-                    <a-cylinder position="10 3 5" radius="1" height="4" color="#00ffff" class="clickable" animation="property: scale; to: 1.1 1.1 1.1; dir: alternate; loop: true; dur: 3000"></a-cylinder>
-                    
-                    <!-- Behind -->
-                    <a-sphere position="0 5 12" radius="4" color="#6600ff" class="clickable" animation="property: rotation; to: 360 360 0; loop: true; dur: 28000"></a-sphere>
-                    <a-sphere position="-4 -3 10" radius="1.8" color="#ff9900" class="clickable" animation="property: rotation; to: 0 360 360; loop: true; dur: 16000"></a-sphere>
-                    <a-torus position="0 5 12" radius="3" radius-tubular="0.15" color="#ffffff" rotation="0 30 0" animation="property: rotation; to: 0 390 0; loop: true; dur: 35000"></a-torus>
-                    
-                    <!-- Above -->
-                    <a-box position="0 12 -5" depth="3" height="3" width="3" color="#99ff99" class="clickable" animation="property: rotation; to: 360 0 360; loop: true; dur: 20000"></a-box>
-                    
-                    <!-- Below -->
-                    <a-cylinder position="0 -8 0" radius="1.5" height="5" color="#ff00ff" class="clickable" animation="property: scale; to: 1.3 1.3 1.3; dir: alternate; loop: true; dur: 5000"></a-cylinder>
-                    
-                    <!-- Asteroids - Scattered in 360° -->
-                    <a-sphere position="-3 1 -5" radius="0.8" color="#808080" animation="property: position; to: -4 2 -6; dir: alternate; loop: true; dur: 5000"></a-sphere>
-                    <a-sphere position="3 -1 -7" radius="1" color="#a9a9a9" animation="property: rotation; to: 0 360 360; loop: true; dur: 10000"></a-sphere>
-                    <a-sphere position="-8 3 5" radius="1.2" color="#696969" animation="property: position; to: -9 4 6; dir: alternate; loop: true; dur: 6000"></a-sphere>
-                    <a-sphere position="7 -2 4" radius="0.9" color="#808080" animation="property: rotation; to: 360 0 360; loop: true; dur: 12000"></a-sphere>
-                    <a-sphere position="2 4 10" radius="1.1" color="#a9a9a9" animation="property: position; to: 3 5 11; dir: alternate; loop: true; dur: 7000"></a-sphere>
-                    <a-sphere position="-5 -4 8" radius="0.7" color="#696969" animation="property: rotation; to: 0 -360 0; loop: true; dur: 9000"></a-sphere>
-                    <a-sphere position="0 6 -10" radius="1.3" color="#808080" animation="property: position; to: 0 7 -11; dir: alternate; loop: true; dur: 4000"></a-sphere>
-                    <a-sphere position="4 2 12" radius="0.6" color="#a9a9a9" animation="property: rotation; to: 360 360 0; loop: true; dur: 11000"></a-sphere>
-                    
-                    <!-- Spaceships - Multiple, moving in 360° -->
-                    <a-cone position="-2 4 -15" radius-bottom="1" radius-top="0" height="3" color="#ff4500" rotation="0 0 90" animation="property: position; to: 2 4 -15; dir: alternate; loop: true; dur: 8000"></a-cone>
-                    <a-cone position="10 5 0" radius-bottom="1.2" radius-top="0" height="4" color="#00ff00" rotation="0 90 0" animation="property: position; to: 10 5 -10; dir: alternate; loop: true; dur: 10000"></a-cone>
-                    <a-cone position="-10 -3 5" radius-bottom="0.8" radius-top="0" height="2.5" color="#0000ff" rotation="0 -90 0" animation="property: position; to: -10 -3 15; dir: alternate; loop: true; dur: 7000"></a-cone>
-                    <a-cone position="0 0 15" radius-bottom="1.5" radius-top="0" height="5" color="#ffff00" rotation="180 0 0" animation="property: position; to: 5 0 15; dir: alternate; loop: true; dur: 12000"></a-cone>
-                    
-                    <!-- Star Particles - Dense field scattered in 360° (more added for fullness) -->
-                    <a-sphere position="-10 5 -20" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="10 6 -18" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="0 10 -25" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-8 -3 -22" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="7 2 -19" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="4 -5 -24" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-6 8 -21" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="9 -2 -23" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-4 7 -26" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="5 1 -17" radius="0.1" color="#ffffff"></a-sphere>
-                    <!-- Additional stars behind and sides -->
-                    <a-sphere position="-15 10 10" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="15 -5 8" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="0 -10 20" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-12 3 15" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="12 7 -10" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="8 -8 12" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-7 4 18" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="6 9 -15" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-9 -2 22" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="10 6 25" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="0 12 0" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="0 -12 0" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-20 0 0" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="20 0 0" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="0 0 -30" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="0 0 30" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-15 -10 -15" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="15 10 15" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="-5 15 -10" radius="0.1" color="#ffffff"></a-sphere>
-                    <a-sphere position="5 -15 10" radius="0.1" color="#ffffff"></a-sphere>
-                    
-                    <!-- Camera with explicit look-controls for tilt -->
-                    <a-camera position="0 1.6 0" look-controls="enabled: true"></a-camera>
-                </a-scene>
-            </div>
-            <p>Navigate the cosmos above — tilt your phone to look around in full 360°! (Grant permission on mobile for full effect)</p>
-        </div>
-
-        <div class="features">
+        <div class="english">
+            <h1>METAour.com - Explore the Metaverse Cosmos</h1>
+            <p>Your gateway to shared cosmic experiences in the metaverse.</p>
+            <h2>Launching into the Metaverse Soon!</h2>
+            <p>METAour.com is crafting an infinite digital cosmos for explorers like you. Connect through shared stories, stellar events, and immersive>
+            <p>Journey into virtual galaxies, build persistent hubs, and co-create the future of the meta era. On mobile, grant motion permission in th>
+            <h3>Preview Our Cosmic Metaverse Hub (Tilt Your Phone to Explore 360°!)</h3>
+            <p>Navigate the cosmos, Visit the VR room by following the links below— tilt your phone to look around in full 360°! (Grant permission on m>
             <h2>Cosmic Metaverse Vision</h2>
             <ul>
-                <li><strong>Web-Based Stellar Hub</strong>: Dive into a browser-based universe (no VR required at launch) powered by WebXR/A-Frame for seamless exploration on any device.</li>
-                <li><strong>Custom Avatars & Galactic Spaces</strong>: Craft unique avatars, host interstellar gatherings, voice chats, and live events in persistent cosmic communities.</li>
-                <li><strong>User-Generated Galaxies</strong>: Build and share your own virtual planets, nebulae galleries, or experiences with intuitive tools.</li>
-                <li><strong>Stellar Events & Expeditions</strong>: Host immersive cosmic conferences, art orbits, storytelling sessions, or collaborative missions.</li>
-                <li><strong>Interstellar Interoperability & AI</strong>: Future portable avatars/assets across metaverses, with AI companions and personalized cosmic recommendations.</li>
+                <li><strong>Web-Based Stellar Hub</strong>: Dive into a browser-based universe (no VR required at launch) powered by WebXR/A-Frame for >
+                <li><strong>Custom Avatars & Galactic Spaces</strong>: Craft unique avatars, host interstellar gatherings, voice chats, and live events>
+                <li><strong>User-Generated Galaxies</strong>: Build and share your own virtual planets, nebulae galleries, or experiences with intuitiv>
+                <li><strong>Stellar Events & Expeditions</strong>: Host immersive cosmic conferences, art orbits, storytelling sessions, or collaborati>
+                <li><strong>Interstellar Interoperability & AI</strong>: Future portable avatars/assets across metaverses, with AI companions and perso>
                 <li><strong>Community Orbit Governance</strong>: Token/vote-based decisions to shape our shared universe.</li>
             </ul>
+            <p><a href="https://metaour.com/VRroom.html">Enter VR Cosmos</a></p>
+            <p><a href="https://metaour.com/VRr00m.html">Enter VR room</a></p>
+            <p><a href="https://metaour.com/VRrOOm.html">Meteor Launch Pad</a></p>
+            <p><a href="https://metaour.com/space-place-directory.html">Learn more about Space</a></p>
+            <p><a href="https://metaour.com/SpaceRace.html">Play SpaceRace</a></p>
+            <hr>
+            <p>&copy 2025-2026 • METAour.com</p>
         </div>
 
-        <div class="gallery">
-            <img class="parallax" src="https://media.istockphoto.com/id/157639696/photo/purple-space-stars.jpg?s=612x612&w=0&k=20&c=fkLtGZxUS9UPlLJUTeGjvvURT0u-vtxvj5sAYbDNrH4=" alt="Nebula Galaxy">
-            <img class="parallax" src="https://bankcoin.loan/space.gif" alt="Astronaut in Space">
-            <img class="parallax" src="https://cdn.mos.cms.futurecdn.net/v2/t:0,l:160,cw:960,ch:720,q:80,w:960/FaWKMJQnr2PFcYCmEyfiTm.jpg" alt="Earth from Space">
-            <img class="parallax" src="https://bankcoin.loan/VRgirl.gif" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space1.jpg" alt="Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space2.jpg" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space3.jpg" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space3.gif" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space4.jpg" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space5.jpg" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space6.jpg" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://bankcoin.loan/Space7.jpg" alt="Metaverse Space Theme">
-            <img class="parallax" src="https://as2.ftcdn.net/jpg/05/08/92/77/1000_F_508927792_67nTvw0aZfBe9QGgxyJ37DH16TndOnVW.jpg" alt="Stars and Galaxies">
-            <img class="parallax" src="https://spaceplace.nasa.gov/launching-into-space/en/GRACE_launch.en.jpg" alt="Rocket Launch">
+        <div class="spanish" style="display: none;">
+            <h1>METAour.com - Explora el Cosmos del Metaverso</h1>
+            <p>Tu puerta de entrada a experiencias cósmicas compartidas en el metaverso.</p>
+            <h2>¡Lanzando al Metaverso Pronto!</h2>
+            <p>METAour.com está creando un cosmos digital infinito para exploradores como tú. Conecta a través de historias compartidas, eventos estela>
+            <p>Viaja a galaxias virtuales, construye hubs persistentes y co-crea el futuro de la era meta. En móvil, concede permiso de movimiento en l>
+            <h3>Vista Previa de Nuestro Hub del Metaverso Cósmico (¡Inclina Tu Teléfono para Explorar 360°!)</h3>
+            <p>Explora el cosmos. Visita la sala de realidad virtual siguiendo los enlaces a continuación: ¡inclina tu teléfono para mirar a tu alreded>
+            <h2>Visión del Metaverso Cósmico</h2>
+            <ul>
+                <li><strong>Hub Estelar Basado en Web</strong>: Sumérgete en un universo basado en navegador (no se requiere VR al lanzamiento) impulsa>
+                <li><strong>Avatares Personalizados y Espacios Galácticos</strong>: Crea avatares únicos, hospeda reuniones interestelares, chats de vo>
+                <li><strong>Galaxias Generadas por Usuarios</strong>: Construye y comparte tus propios planetas virtuales, galerías de nebulosas o expe>
+                <li><strong>Eventos Estelares y Expediciones</strong>: Hospeda conferencias cósmicas inmersivas, órbitas de arte, sesiones de narración>
+                <li><strong>Interoperabilidad Interestelar e IA</strong>: Futuros avatares/activos portables a través de metaversos, con compañeros IA >
+                <li><strong>Gobernanza de Órbita Comunitaria</strong>: Decisiones basadas en tokens/votos para dar forma a nuestro universo compartido.>
+            </ul>
+            <p><a href="https://metaour.com/VRroom.html">Entrar al Cosmos VR</a></p>
+            <p><a href="https://metaour.com/VRr00m.html">Entrar a la habitación VR</a></p>
+            <p><a href="https://metaour.com/VRrOOm.html">Plataforma de Lanzamiento Meteor</a></p>
+            <p><a href="https://metaour.com/space-place-directory.html">Aprende más sobre el Espacio</a></p>
+            <p><a href="https://metaour.com/SpaceRace.html">Jugar SpaceRace</a></p>
+            <hr>
+            <p>&copy 2025-2026 • METAour.com</p>
         </div>
-<!-- ... your existing content ... -->
-
-<div style="text-align: center; margin: 60px 0;">
-    <a href="https://metaour.com/VRroom.html" target="_blank" class="vr-button">
-        <span>Enter VR Cosmos</span>
-        <i class="fas fa-rocket"></i>
-    </a>
-</div>
-
-
-
-<div style="text-align: center; margin: 60px 0;">
-    <a href="https://metaour.com/VRr00m.html" target="_blank" class="vr-button">
-        <span>Enter VR room</span>
-        <i class="fas fa-rocket"></i>
-    </a>
-</div>
-
-
-<div style="text-align: center; margin: 60px 0;">
-    <a href="https://metaour.com/VRrOOm.html" target="_blank" class="vr-button">
-        <span>Meteor Launch Pad </span>
-        <i class="fas fa-rocket"></i>
-    </a>
-</div>
-
-<div style="text-align: center; margin: 60px 0;">
-    <a href="https://metaour.com/space-place-directory.html" target="_blank" class="vr-button">
-        <span>Learn more about Space</span>
-        <i class="fas fa-rocket"></i>
-    </a>
-</div>
-
-<div style="text-align: center; margin: 60px 0;">
-    <a href="https://metaour.com/SpaceRace.html" target="_blank" class="vr-button">
-        <span>Play SpaceRace</span>
-        <i class="fas fa-rocket"></i>
-    </a>
-</div>
-
-<style>
-    .vr-button {
-        display: inline-block;
-        padding: 18px 40px;
-        background: linear-gradient(45deg, #0f0020, #6480ff);
-        color: #ffffff;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1.4rem;
-        font-weight: bold;
-        text-decoration: none;
-        border-radius: 50px;
-        box-shadow: 0 0 30px rgba(100, 150, 255, 0.8);
-        transition: all 0.4s ease;
-        border: 2px solid #a0c4ff;
-        position: relative;
-        overflow: hidden;
-    }
-    .vr-button::before {
-        content: '';
-        position: absolute;
-        top: 0; left: -100%;
-        width: 100%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        transition: left 0.6s;
-    }
-    .vr-button:hover::before {
-        left: 100%;
-    }
-    .vr-button:hover {
-        transform: translateY(-8px) scale(1.05);
-        box-shadow: 0 0 50px rgba(160, 196, 255, 1);
-    }
-    .vr-button i {
-        margin-left: 15px;
-        font-size: 1.6rem;
-    }
-</style>
-<link rel="stylesheet" href="https://kit.fontawesome.com/a076d05399.js">
-<!-- ... rest of page ... -->
-        <button class="cta" onclick="alert('Notify me feature coming soon!')">Notify Me on Launch</button>
-        <button class="cta" onclick="alert('Join our community Discord soon!')">Join the Cosmic Community</button>
-        
-        <footer>
-            &copy; 2025-2026 METAour.com | Exploring Infinite Horizons 🚀🌎
-        </footer>
     </div>
 
     <script>
-        // Handle device orientation for 3D tilt parallax on page elements
-        function handleOrientation(event) {
-            const beta = event.beta || 0; // Front-to-back tilt
-            const gamma = event.gamma || 0; // Left-to-right tilt
-            const tiltX = beta / 4; // Soften effect
-            const tiltY = -gamma / 4;
-            document.querySelectorAll('.parallax').forEach(el => {
-                el.style.transform = `rotateX(\( {tiltX}deg) rotateY( \){tiltY}deg)`;
-            });
-        }
+        function toggleLanguage() {
+            const select = document.getElementById('language-toggle');
+            const english = document.querySelector('.english');
+            const spanish = document.querySelector('.spanish');
 
-        // Add listener (permission handled by A-Frame; events fire globally once granted)
-        window.addEventListener('deviceorientation', handleOrientation);
+            if (select.value === 'english') {
+                english.style.display = 'block';
+                spanish.style.display = 'none';
+            } else {
+                english.style.display = 'none';
+                spanish.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
